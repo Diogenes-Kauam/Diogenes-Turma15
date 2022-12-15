@@ -2,7 +2,7 @@ import pygame
 
 from dino_runner.components.dinosaur import Dinossauro
 from dino_runner.components.obstacles.obstacle_manager import ObstacleManager
-from dino_runner.utils.constants import BG, ICON, SCREEN_HEIGHT, SCREEN_WIDTH, TITLE, FPS
+from dino_runner.utils.constants import BG, ICON, SCREEN_HEIGHT, SCREEN_WIDTH, TITLE, FPS, DINO_START
 
 FONT_STYLE = "freesansbold.ttf"
 
@@ -119,6 +119,7 @@ class Game:
         self.screen.fill((255, 255, 255))
         if self.death_count == 0:
             self.formatted_text('Pressione qualquer tecla para jogar', -50, 150)
+            self.screen.blit(DINO_START, (self.half_scream_width - -200, self.half_scream_height - 0))
         else:
             self.screen.blit(ICON, (self.half_scream_width - -200, self.half_scream_height - 250))
             self.formatted_text('Pressione qualquer tecla para jogar novamente', 0, 50)
