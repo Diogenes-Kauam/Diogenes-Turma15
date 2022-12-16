@@ -1,8 +1,14 @@
 import pygame
 from pygame.sprite import Sprite
 
-from dino_runner.utils.constants import RUNNING, JUMPING, DUCKING
+from dino_runner.utils.constants import RUNNING, JUMPING, DUCKING, DEFAULT_TYPE, SHIELD_TYPE, DUCKING_SHIELD, JUMPING_SHIELD, RUNNING_SHIELD, DUCKING_HAMMER, JUMPING_HAMMER, RUNNING_HAMMER
 
+DOWN_IMG = {DEFAULT_TYPE: DUCKING, SHIELD_TYPE: DUCKING_SHIELD}
+JUMP_IMG = {DEFAULT_TYPE: JUMPING, SHIELD_TYPE: JUMPING_SHIELD}
+RUN_IMG = {DEFAULT_TYPE: RUNNING, SHIELD_TYPE: RUNNING_SHIELD}
+
+pygame.mixer.init()
+pulo = pygame.mixer.Sound('/Users/fruto/Desktop/Diogenes-Turma15/dino_runner/assets/Other/pulo.mp3')
 class Dinossauro(Sprite):
 
     X_POS = 80
@@ -11,7 +17,8 @@ class Dinossauro(Sprite):
     JUMP_VEL = 8.5
 
     def __init__(self):
-        self.image = RUNNING[0]
+        self.type = DEFAULT_TYPE
+        self.image = RUN_IMG[self.type][0]
         self.dino_rect = self.image.get_rect()
         self.dino_rect.x = self.X_POS
         self.dino_rect.y = self.Y_POS
@@ -21,6 +28,12 @@ class Dinossauro(Sprite):
         self.jump_vel = self.JUMP_VEL
         self.dino_down = False
 
+    def setup_state(self):
+        self.has_power_up = False
+        self.shield = False
+        self.show_text = False
+        self.shield_time_up = 0
+
     def update(self, user_input):
         if self.dino_run:
             self.run()
@@ -29,10 +42,18 @@ class Dinossauro(Sprite):
         elif self.dino_down:
             self.down()
 
-        if user_input[pygame.K_SPACE] or user_input[pygame.K_UP ] and not self.dino_jump:
+        if user_input[pygame.K_SPACE] and not self.dino_jump:
             self.dino_jump = True
             self.dino_run = False
             self.dino_down = False
+            if self.dino_jump:
+                pulo.play()
+        elif user_input[pygame.K_UP] and not self.dino_jump:
+            self.dino_jump = True
+            self.dino_run = False
+            self.dino_down = False
+            if self.dino_jump:
+                pulo.play()
         elif user_input[pygame.K_DOWN] and not self.dino_jump:
             self.dino_run = False
             self.dino_jump = False
@@ -42,18 +63,25 @@ class Dinossauro(Sprite):
             self.dino_jump = False
             self.dino_down = False
 
-        if self.step_index >= 10:
+        if self.step_index >= 9:
             self.step_index = 0
 
+    def run(self):
+        self.image = RUN_IMG[self.type][self.step_index // 5]
+        self.dino_rect = self.image.get_rect()
+        self.dino_rect.x = self.X_POS
+        self.dino_rect.y = self.Y_POS
+        self.step_index += 1
+
     def down(self):
-        self.image = DUCKING[0] if self.step_index < 5 else DUCKING[1]
+        self.image = DOWN_IMG[self.type][self.step_index // 5]
         self.dino_rect = self.image.get_rect()
         self.dino_rect.x = self.X_POS
         self.dino_rect.y = self.Y_POS_DOWN
         self.step_index += 1
 
     def jump(self):
-        self.image = JUMPING
+        self.image = JUMP_IMG[self.type]
         if self.dino_jump:
             self.dino_rect.y -= self.jump_vel * 4
             self.jump_vel -= 0.8
@@ -62,13 +90,6 @@ class Dinossauro(Sprite):
             self.dino_rect.y = self.Y_POS
             self.dino_jump = False
             self.jump_vel = self.JUMP_VEL
-
-    def run(self):
-        self.image = RUNNING[0] if self.step_index < 5 else RUNNING[1]
-        self.dino_rect = self.image.get_rect()
-        self.dino_rect.x = self.X_POS
-        self.dino_rect.y = self.Y_POS
-        self.step_index += 1
 
     def draw(self, scream: pygame.Surface):
         scream.blit(self.image, (self.dino_rect.x, self.dino_rect.y))
