@@ -3,6 +3,7 @@ import pygame
 from dino_runner.components.dinosaur import Dinossauro
 from dino_runner.components.obstacles.obstacle_manager import ObstacleManager
 from dino_runner.utils.constants import BG, ICON, SCREEN_HEIGHT, SCREEN_WIDTH, TITLE, FPS, DINO_START, DEFAULT_TYPE
+from dino_runner.utils.text_utils import draw_message_component
 from dino_runner.components.power_ups.power_up_manager import PowerUpManager
 
 FONT_STYLE = "freesansbold.ttf"
@@ -69,7 +70,12 @@ class Game:
     def update_score(self):
         self.score += 1
         if self.score % 100 == 0:
-            self.game_speed += 5
+            self.game_speed += 1
+        
+    def update_score1(self):
+        self.score += 100
+        if self.score % 100 == 0:
+            self.game_speed += 1
 
     def score_final(self):
         self.score_list.append(self.score)
@@ -109,8 +115,8 @@ class Game:
         if self.player.has_power_up:
             time_to_show = round((self.player.power_up_time - pygame.time.get_ticks()) / 1000, 2)
             if time_to_show >= 0:
-                self.formatted_text(
-                    f'{self.player.type.capitalize()} habilitado para {time_to_show} segundos.', 500, 40)
+                draw_message_component(
+                    f"{self.player.type.capitalize()} habilitado para {time_to_show} segundos", self.screen, font_size = 18, pos_x_center = 500, pos_y_center = 40)
             else:
                 self.player.has_power_up = False
                 self.player.type = DEFAULT_TYPE
@@ -129,7 +135,6 @@ class Game:
         text_rect = text.get_rect()
         text_rect_center = (self.half_scream_width - posi_x, self.half_scream_height - posi_y)
         self.screen.blit(text, text_rect_center)
-
 
     def show_menu(self):
         self.screen.fill((255, 255, 255))

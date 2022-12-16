@@ -21,3 +21,6 @@ class PowerUp(Sprite):
 
     def draw(self, screem):
         screem.blit(self.image, self.rect)
+
+    def reset_time(self):
+        self.start_time = 0
